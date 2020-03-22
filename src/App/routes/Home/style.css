@@ -1,0 +1,8 @@
+.Home {
+  max-width: 1000px;
+  width: 50vw;
+}
+
+.Home .gameInfoCard {
+  display: inline-block;
+}

@@ -12,13 +12,3 @@
   align-items: center;
   justify-content: center;
 }
-
-.App main {
-  max-width: 1000px;
-  width: 50vw;
-  display: inline;
-}
-
-.App .gameInfoCard {
-  display: inline-block;
-}

@@ -1,0 +1,20 @@
+.GameMenu {
+  display: flex;
+  flex-direction: row;
+}
+
+.GameMenu .options{
+  margin: 0;
+  padding: 20px;
+  list-style-type: none;
+  background-color: crimson;
+  align-items: stretch;
+}
+
+.GameMenu .options li {
+  margin-bottom: 10px;
+}
+
+.GameMenu .poster{
+  height: 70vh;
+}
