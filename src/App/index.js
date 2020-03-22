@@ -1,8 +1,8 @@
 import React from 'react';
-import logo from './logo.svg';
 import AppLogo from './components/AppLogo';
 import GameInfoCard from './components/GameInfoCard';
-import './App.css';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import './style.css';
 
 const fakeImgUrl = 'https://ae01.alicdn.com/kf/HTB1fItvXACWBuNjy0Faq6xUlXXaI/Snake-30X42-CM-nostalgia-vintage-kraft-paper-poster-no-frame-painting-tattoo-shop-wall-decoration.jpg_q50.jpg';
 const fakeData = [
