@@ -1,14 +1,16 @@
 .GameInfoCard {
   overflow: hidden;
   width: 200px;
-  padding: 5px;
+  margin: 10px;
+  border: 1px solid lightgray;
+  border-radius: 2px;
 }
 
 .GameInfoCard img {
   height: 250px;
-  width: calc(100% - 10px);
+  width: 100%;
 }
 
 .GameInfoCard label {
-  font-size: Large
+  font-size: Large;
 }
