@@ -8,7 +8,7 @@ const GameSettings = lazy(() => import('./routes/GameSettings'));
 
 const Game = (props) => {
   return (
-    <Suspense fallback={() => 'Loading...'}>
+    <Suspense fallback={<div>Loading...</div>}>
       <Switch>
         <Route path={`/game/:id/play`} component={GamePlay}/>
         <Route path={`/game/:id/settings`} component={GameSettings}/>
