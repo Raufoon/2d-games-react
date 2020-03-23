@@ -12,16 +12,20 @@ const fakeGetSetupData = () => Promise.resolve({
 });
 
 class GamePlay extends React.Component {
+  static initialState = {
+    isLoading: false,
+    isFailed: false,
+    hasStarted: false,
+    isPaused: false,
+    hasEnded: false,
+  }
+
   constructor(props) {
     super(props);
 
     this.state = {
+      ...GamePlay.initialState,
       isLoading: true,
-      isFailed: false,
-      isLoaded: false,
-      isPaused: false,
-      hasEnded: false,
-
       view: {
         width: 500,
         height: 200,
@@ -42,21 +46,26 @@ class GamePlay extends React.Component {
       this.setState({isLoading: false, isFailed: true});
 
     } finally {
-      this.setState({isLoading: false, isLoaded: true});
-      this.game.start();
+      this.startGame();
     }
+  }
+
+  startGame = () => {
+    this.setState({...GamePlay.initialState, hasStarted: true});
+    this.game.start();
   }
 
   async _fetchGame(id) {
     const gameModule = await import(`../../../../../services/game-libs/${id}.js`);
-    const onExit = () => this.setState({hasEnded: true});
+
+    const onExit = () => this.setState({...GamePlay.initialState, hasEnded: true});
 
     const Game = gameModule.default;
     return new Game(this.gameCanvas, this.scoreCanvas, onExit);
   }
 
   exitGame = () => {
-    this.setState({hasEnded: true});
+    this.setState({...GamePlay.initialState, hasEnded: true});
     this.game.exit();
   }
 
@@ -67,7 +76,7 @@ class GamePlay extends React.Component {
   render() {
     const url = this.props.match.url;
     const {width, height} = this.state.view;
-    const {isLoading, isFailed, hasEnded} = this.state;
+    const {isLoading, hasStarted, isFailed, hasEnded} = this.state;
 
     return (
       <div className="GamePlay">
@@ -79,7 +88,11 @@ class GamePlay extends React.Component {
 
         <canvas className="scoreCanvas" ref={el => this.scoreCanvas = el} width={width} height={100}></canvas>
 
-        <button onClick={this.exitGame}>End</button>
+        <div>
+          {hasStarted && <button onClick={this.exitGame}>End</button>}
+          {hasEnded && <button onClick={this.props.history.goBack}>Back to menu</button>}
+          {hasEnded && <button onClick={this.startGame}>Play again</button>}
+        </div>
       </div>
     )
   }
