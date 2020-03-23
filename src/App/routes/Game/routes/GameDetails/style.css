@@ -1,0 +1,33 @@
+.GameDetails {
+  display: flex;
+  flex-direction: row;
+}
+
+.GameDetails .options{
+  margin: 0;
+  padding: 20px;
+  list-style-type: none;
+  background-color: #671b26;
+  align-items: stretch;
+}
+
+.GameDetails .options li {
+  margin-bottom: 10px;
+}
+
+.GameDetails .poster{
+  height: 600px;
+  width: 400px;
+  position: relative;
+  background-size: cover;
+}
+
+.GameDetails .title {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background-color: #222;
+  color: white;
+  width: 100%;
+  font-size: 40px;
+}

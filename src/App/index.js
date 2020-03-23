@@ -4,7 +4,7 @@ import { Route, Switch, Link } from 'react-router-dom';
 import Home from './routes/Home';
 import './style.css';
 
-const GameMenu = lazy(() => import('./routes/GameMenu'));
+const Game = lazy(() => import('./routes/Game'));
 
 function App() {
   return (
@@ -18,7 +18,7 @@ function App() {
         <Suspense fallback={<div>loading...</div>}>
           <Switch>
             <Route exact path="/" component={Home}/>,
-            <Route path="/game/:id" component={GameMenu}/>
+            <Route path="/game/:id" component={Game}/>
           </Switch>
         </Suspense>
       </main>

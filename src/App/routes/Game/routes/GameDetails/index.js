@@ -9,7 +9,7 @@ const fakeData = {
   posterUrl: fakeImgUrl
 };
 
-class GameMenu extends React.Component {
+class GameDetails extends React.Component {
   constructor(props) {
     super(props);
 
@@ -23,8 +23,11 @@ class GameMenu extends React.Component {
     const {url} = this.props.match;
 
     return (
-      <div className="GameMenu">
-        <img className="poster" src={posterUrl}></img>
+      <div className="GameDetails">
+        <div className="poster" style={{backgroundImage: `url(${posterUrl})`}}>
+          <label className='title'>{title}</label>
+        </div>
+
         <ul className="options">
           <li><Link to={`${url}/play`}>Start Game</Link></li>
           <li><Link to={`${url}/settings`}>Settings</Link></li>
@@ -35,4 +38,4 @@ class GameMenu extends React.Component {
   }
 }
 
-export default withRouter(GameMenu);
+export default withRouter(GameDetails);

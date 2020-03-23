@@ -1,0 +1,4 @@
+.GamePlay {
+  display: flex;
+  flex-direction: column;
+}
