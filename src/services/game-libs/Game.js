@@ -1,7 +1,11 @@
 class Game {
   constructor(gameCanvas, scoreCanvas, onExit) {
-    this._keyListeners = [];
     this._onExit = onExit;
+    this.reset();
+  }
+
+  reset() {
+    this._keyListeners = [];
   }
 
   registerKeyListener(key, listener) {
@@ -21,6 +25,7 @@ class Game {
   exit() {
     this._onExit();
     this._unregisterAllKeyListeners();
+    this.reset();
   }
 }
 
