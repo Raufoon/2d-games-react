@@ -2,40 +2,23 @@ import React from 'react';
 import {withRouter, Link} from 'react-router-dom';
 import './style.css';
 
-const fakeImgUrl = 'https://ae01.alicdn.com/kf/HTB1fItvXACWBuNjy0Faq6xUlXXaI/Snake-30X42-CM-nostalgia-vintage-kraft-paper-poster-no-frame-painting-tattoo-shop-wall-decoration.jpg_q50.jpg';
-const fakeData = {
-  id: 1,
-  title: "Snake Game",
-  posterUrl: fakeImgUrl
-};
+const GameDetails = (props) => {
+  const {title, posterUrl} = props;
+  const {url} = props.match;
 
-class GameDetails extends React.Component {
-  constructor(props) {
-    super(props);
+  return (
+    <div className="GameDetails">
+      <div className="poster" style={{backgroundImage: `url(${posterUrl})`}}/>
 
-    this.state = {
-      ...fakeData,
-    }
-  }
+      <label className='title'>{title}</label>
 
-  render() {
-    const {title, posterUrl} = this.state;
-    const {url} = this.props.match;
-
-    return (
-      <div className="GameDetails">
-        <div className="poster" style={{backgroundImage: `url(${posterUrl})`}}/>
-
-        <label className='title'>{title}</label>
-
-        <ul className="options">
-          <li><Link className="option" to={`${url}/play`}>Start Game</Link></li>
-          <li><Link className="option" to={`${url}/settings`}>Settings</Link></li>
-          <li><Link className="option" to="/">Back</Link></li>
-        </ul>
-      </div>
-    )
-  }
+      <ul className="options">
+        <li><Link className="option" to={`${url}/play`}>Start Game</Link></li>
+        <li><Link className="option" to={`${url}/settings`}>Settings</Link></li>
+        <li><Link className="option" to="/">Back</Link></li>
+      </ul>
+    </div>
+  )
 }
 
 export default withRouter(GameDetails);
