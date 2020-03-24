@@ -95,6 +95,7 @@ class GamePlay extends React.Component {
         <ul className="section">
           <li>
             {isLoading && <div className="message">Loading game :) Please wait!!!</div>}
+            {hasStarted && <div className="message">Game running</div>}
             {isFailed && <div className="message">Failed to load game :(</div>}
             {hasEnded && <div className="message">Game Over!</div>}
           </li>
