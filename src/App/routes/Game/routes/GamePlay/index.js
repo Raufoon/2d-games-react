@@ -8,7 +8,8 @@ const fakeGetSetupData = () => Promise.resolve({
   view: {
     width: 500,
     height: 500,
-  }
+  },
+  instructions: "Some instructions will be here"
 });
 
 class GamePlay extends React.Component {
@@ -36,9 +37,9 @@ class GamePlay extends React.Component {
   async _initGame() {
     try {
       const setupData = await fakeGetSetupData();
-      const {id, view} = setupData;
+      const {id, view, instructions} = setupData;
 
-      this.setState({view});
+      this.setState({view, instructions});
       this.game = await this._fetchGame(id);
       Logger.showSuccess("Game loaded", this.game);
 
@@ -77,22 +78,37 @@ class GamePlay extends React.Component {
     const url = this.props.match.url;
     const {width, height} = this.state.view;
     const {isLoading, hasStarted, isFailed, hasEnded} = this.state;
+    const {instructions} = this.state;
 
     return (
       <div className="GamePlay">
-        {isLoading && <div>Loading game :) Please wait!!!</div>}
-        {isFailed && <div>Failed to load game :(</div>}
-        {hasEnded && <div>Game Over!</div>}
 
-        <canvas className="gameCanvas" ref={el => this.gameCanvas = el} width={width} height={height}></canvas>
+        <ul className="section">
+          <li>
+            <canvas className="gameCanvas" ref={el => this.gameCanvas = el} width={width} height={height}></canvas>
+          </li>
+          <li>
+            <p>{instructions}</p>
+          </li>
+        </ul>
 
-        <canvas className="scoreCanvas" ref={el => this.scoreCanvas = el} width={width} height={100}></canvas>
-
-        <div>
-          {hasStarted && <button onClick={this.exitGame}>End</button>}
-          {hasEnded && <button onClick={this.props.history.goBack}>Back to menu</button>}
-          {hasEnded && <button onClick={this.startGame}>Play again</button>}
-        </div>
+        <ul className="section">
+          <li>
+            {isLoading && <div className="message">Loading game :) Please wait!!!</div>}
+            {isFailed && <div className="message">Failed to load game :(</div>}
+            {hasEnded && <div className="message">Game Over!</div>}
+          </li>
+          <li>
+            <canvas className="scoreCanvas" ref={el => this.scoreCanvas = el} width={300} height={200}></canvas>
+          </li>
+          <li>
+            <div className="options">
+              {hasStarted && <button onClick={this.exitGame}>End</button>}
+              {hasEnded && <button onClick={this.props.history.goBack}>Back to menu</button>}
+              {hasEnded && <button onClick={this.startGame}>Play again</button>}
+            </div>
+          </li>
+        </ul>
       </div>
     )
   }
