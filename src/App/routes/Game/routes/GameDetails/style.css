@@ -1,25 +1,39 @@
 .GameDetails {
   display: flex;
   flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 
 .GameDetails .options{
   margin: 0;
   padding: 20px;
   list-style-type: none;
-  background-color: #671b26;
   align-items: stretch;
 }
 
 .GameDetails .options li {
-  margin-bottom: 10px;
+  margin: 10px;
+  border: 1px solid lightgray;
+}
+.GameDetails .options .option {
+  min-width: 150px;
+  padding: 10px;
+  font-size: large;
+  color: gray !important;
+  background-color: white;
+  display: inline-block;
+}
+.GameDetails .options .option:hover{
+  cursor: pointer;
+  background-color: lightgray;
 }
 
 .GameDetails .poster{
   height: 600px;
   width: 400px;
-  position: relative;
   background-size: cover;
+  border: 1px solid lightgray;
 }
 
 .GameDetails .title {

@@ -6,11 +6,17 @@
   border-radius: 2px;
 }
 
+.GameInfoCard:hover {
+  cursor: pointer;
+  box-shadow: 0 0 5px lightgray;
+}
+
 .GameInfoCard img {
   height: 250px;
   width: 100%;
 }
 
-.GameInfoCard label {
-  font-size: Large;
+.GameInfoCard h3 {
+  font-weight: normal;
+  margin: 5px;
 }

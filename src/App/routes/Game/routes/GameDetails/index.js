@@ -24,14 +24,14 @@ class GameDetails extends React.Component {
 
     return (
       <div className="GameDetails">
-        <div className="poster" style={{backgroundImage: `url(${posterUrl})`}}>
-          <label className='title'>{title}</label>
-        </div>
+        <div className="poster" style={{backgroundImage: `url(${posterUrl})`}}/>
+
+        <label className='title'>{title}</label>
 
         <ul className="options">
-          <li><Link to={`${url}/play`}>Start Game</Link></li>
-          <li><Link to={`${url}/settings`}>Settings</Link></li>
-          <li><Link to="/">Home</Link></li>
+          <li><Link className="option" to={`${url}/play`}>Start Game</Link></li>
+          <li><Link className="option" to={`${url}/settings`}>Settings</Link></li>
+          <li><Link className="option" to="/">Back</Link></li>
         </ul>
       </div>
     )
