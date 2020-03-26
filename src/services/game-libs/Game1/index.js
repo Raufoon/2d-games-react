@@ -6,12 +6,12 @@ import Logger from '../../Logger';
 
 const {UP, DOWN, LEFT, RIGHT} = FACE;
 const {SYNC_GAME_STATE, CHANGE_FACE, START_WORKER, STOP_WORKER} = COMMANDS;
-const {SYNC_RESULT_STATE} = COMMANDS;
+const {SYNC_RESULT_STATE, GET_KILLED} = COMMANDS;
 const {APPLE} = FRUIT;
 
 class SnakeGame extends Game {
-  constructor(id, gameCanvas, resultCanvas, onExit) {
-    super(id, gameCanvas, resultCanvas, onExit);
+  constructor(id, gameCanvas, resultCanvas, onEnd) {
+    super(id, gameCanvas, resultCanvas, onEnd);
 
     this.gameCanvasProps = {
       ...super.gameCanvasProps,
@@ -51,6 +51,10 @@ class SnakeGame extends Game {
 
       case SYNC_RESULT_STATE:
         this.updateResultState(rest);
+        break;
+
+      case GET_KILLED:
+        this.end();
         break;
 
       default:
@@ -153,6 +157,8 @@ class SnakeGame extends Game {
   }
 
   end() {
+    super.end();
+    this.resultCanvasPainter.drawText("YOU DIED!!", 1, 10, {size: 40, color: 'red'});
     this.worker.postMessage({command: STOP_WORKER});
   }
 }

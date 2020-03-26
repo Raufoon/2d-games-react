@@ -2,8 +2,8 @@ import Logger from '../../Logger';
 import Painter from './Painter.js';
 
 class Game {
-  constructor(id, gameCanvas, resultCanvas, onExit) {
-    this._onExit = onExit;
+  constructor(id, gameCanvas, resultCanvas, onEnd) {
+    this.onEnd = onEnd;
     this._keyListeners = {};
     this.id = id;
 
@@ -55,8 +55,8 @@ class Game {
     this._keyListeners[key] = listener;
   }
 
-  unregisterKeyListener(key) {
-    delete this._keyListeners[key];
+  unregisterAllKeyListeners() {
+    this._keyListeners = {};
   }
 
   start() {
@@ -90,8 +90,9 @@ class Game {
 
   end() {
     document.removeEventListener('keyup', this._handleKeyEvent);
+    this.unregisterAllKeyListeners();
     this.updateGameState({...this.initialGameState, hasEnded: true}, false);
-    this._keyListeners = {};
+    this.onEnd();
   }
 
   exit() {
@@ -99,7 +100,6 @@ class Game {
       this.worker.terminate();
       delete this.worker;
     }
-    this._onExit();
   }
 }
 

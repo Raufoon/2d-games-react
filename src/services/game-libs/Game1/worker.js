@@ -4,12 +4,11 @@ import {FACE, COMMANDS} from './constants.js';
 
 const {UP, DOWN, LEFT, RIGHT} = FACE;
 const {SYNC_GAME_STATE, CHANGE_FACE, START_WORKER, STOP_WORKER} = COMMANDS;
-const {SYNC_RESULT_STATE} = COMMANDS;
+const {SYNC_RESULT_STATE, GET_KILLED} = COMMANDS;
 
 let gameState;
 let gameCanvasProps;
 let snakeMoverInterval;
-
 let resultState;
 
 function random(max) {
@@ -26,36 +25,14 @@ function updateGameState(data, shouldSync=true) {
   if (shouldSync) postMessage({command: SYNC_GAME_STATE, ...data});
 }
 
-function moveSnake() {
-  const {x, y} = gameState;
+function tryEatingFruit() {
+  const {x, y, fruit} = gameState;
   const {relativeWidth, relativeHeight} = gameCanvasProps;
-  let state;
 
-  switch (gameState.face) {
-    case UP:
-      if (y > 0) state = {y: y - 1};
-      break;
-
-    case DOWN:
-      if (y + 1 < relativeHeight) state = {y: y + 1};
-      break;
-
-    case RIGHT:
-      if (x + 1 < relativeWidth) state = {x: x + 1};
-      break;
-
-    case LEFT:
-      if (x > 0) state = {x: x - 1};
-      break;
-
-    default:
-  }
-
-  const {fruit} = gameState;
   if (fruit.x === x && fruit.y === y) {
     Logger.showInfo(`Snake Worker: ATE FRUIT!!!!`, undefined, 'red');
+
     updateGameState({
-      ...state,
       fruit: {
         ...fruit,
         x: random(relativeWidth),
@@ -65,15 +42,68 @@ function moveSnake() {
 
     const {score} = resultState;
     updateResultState({score: score + 1});
+  }
+}
 
-  } else {
-    updateGameState(state);
+function getNextPosition() {
+  const {x, y, face} = gameState;
+  let position;
+
+  switch (face) {
+    case UP:
+      position = {y: y - 1};
+      break;
+
+    case DOWN:
+      position = {y: y + 1};
+      break;
+
+    case RIGHT:
+      position = {x: x + 1};
+      break;
+
+    case LEFT:
+      position = {x: x - 1};
+      break;
+
+    default:
+      position = {x, y};
+  }
+  return position;
+}
+
+function getKilled() {
+  stopSnakeMover();
+  postMessage({command: GET_KILLED});
+}
+
+function moveSnake() {
+  const {relativeWidth, relativeHeight} = gameCanvasProps;
+  const nextPosition = getNextPosition();
+  const {x, y} = nextPosition;
+
+  if (x) {
+    if (x < 0 || x == relativeWidth) {
+      getKilled();
+      return;
+    }
   }
 
+  if (y) {
+    if (y < 0 || y == relativeHeight) {
+      getKilled();
+      return;
+    }
+  }
+
+  updateGameState(nextPosition);
 }
 
 function startSnakeMover() {
-  snakeMoverInterval = setInterval(moveSnake, 800);
+  snakeMoverInterval = setInterval(() => {
+    moveSnake();
+    tryEatingFruit();
+  }, 800);
 }
 
 function stopSnakeMover() {
@@ -109,7 +139,5 @@ function onMessage(event) {
       throw new Error("Unrecognized worker command!");
   }
 }
-
-postMessage("Snake Worker: I have loaded!")
 
 self.addEventListener('message', onMessage, false);

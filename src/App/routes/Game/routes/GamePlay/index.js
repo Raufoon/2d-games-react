@@ -58,9 +58,9 @@ class GamePlay extends React.Component {
 
   async _fetchGame(id) {
     const gameModule = await import(`../../../../../services/game-libs/Game${id}`);
-    const onExit = () => this.setState({...GamePlay.initialState, hasEnded: true});
+    const onEnd = () => this.setState({...GamePlay.initialState, hasEnded: true});
     const Game = gameModule.default;
-    return new Game(id, this.gameCanvas, this.resultCanvas, onExit);
+    return new Game(id, this.gameCanvas, this.resultCanvas, onEnd);
   }
 
   endGame = () => {
