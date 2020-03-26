@@ -1,7 +1,11 @@
 import Game from '../framework/Game.js';
+import {FACE, COMMANDS} from './constants.js';
 // eslint-disable-next-line
 import Worker from "worker-loader!./worker.js";
 import Logger from '../../Logger';
+
+const {UP, DOWN, LEFT, RIGHT} = FACE;
+const {SYNC_GAME_STATE, CHANGE_FACE, START_WORKER, STOP_WORKER} = COMMANDS;
 
 class SnakeGame extends Game {
   constructor(id, gameCanvas, scoreCanvas, onExit) {
@@ -23,36 +27,64 @@ class SnakeGame extends Game {
 
     this.worker = new Worker();
     this.worker.onmessage = this.handleWorkerMsg;
+
     Logger.showSuccess("game init", this);
   }
 
   handleWorkerMsg = (event) => {
     const {data} = event;
-    Logger.showInfo("WORKER --> MAIN: ", data, '#ff7400');
+    const {command, ...rest} = data;
+    Logger.showInfo(`WORKER --> MAIN: ${command}`, data, '#ff7400');
+
+    switch (command) {
+      case SYNC_GAME_STATE:
+        this.updateGameState(rest);
+        break;
+
+      default:
+    }
   }
 
   _onUpPressed = () => {
-    this.updateGameState({
-      y: this.gameState.y - 1
-    });
+    const {face} = this.gameState;
+    if (face === UP || face === DOWN) return;
+
+    const {y} = this.gameState;
+    if (y === 0) return;
+
+    this.worker.postMessage({command: CHANGE_FACE, face: UP});
   }
 
   _onDownPressed = () => {
-    this.updateGameState({
-      y: this.gameState.y + 1
-    });
+    const {face} = this.gameState;
+    if (face === UP || face === DOWN) return;
+
+    const {y} = this.gameState;
+    const {relativeHeight} = this.gameCanvasProps;
+    if (y + 1 === relativeHeight) return;
+
+    this.worker.postMessage({command: CHANGE_FACE, face: DOWN});
   }
 
   _onLeftPressed = () => {
-    this.updateGameState({
-      x: this.gameState.x - 1
-    });
+    const {face} = this.gameState;
+    if (face === LEFT || face === RIGHT) return;
+
+    const {x} = this.gameState;
+    if (x === 0) return;
+
+    this.worker.postMessage({command: CHANGE_FACE, face: LEFT});
   }
 
   _onRightPressed = () => {
-    this.updateGameState({
-      x: this.gameState.x + 1
-    });
+    const {face} = this.gameState;
+    if (face === LEFT || face === RIGHT) return;
+
+    const {x} = this.gameState;
+    const {relativeWidth} = this.gameCanvasProps;
+    if (x + 1 === relativeWidth) return;
+
+    this.worker.postMessage({command: CHANGE_FACE, face: RIGHT});
   }
 
   render() {
@@ -72,14 +104,28 @@ class SnakeGame extends Game {
 
     this.updateGameState({
       x: 1,
-      y: 1
+      y: 1,
+      face: RIGHT
     });
 
     this.registerKeyListener("ArrowUp", this._onUpPressed);
     this.registerKeyListener("ArrowRight", this._onRightPressed);
     this.registerKeyListener("ArrowDown", this._onDownPressed);
     this.registerKeyListener("ArrowLeft", this._onLeftPressed);
+
+    this.worker.postMessage({
+      command: START_WORKER,
+      gameState: this.gameState,
+      gameCanvasProps: this.gameCanvasProps
+    });
+
     Logger.showInfo("game started successfully");
+  }
+
+  end() {
+    this.worker.postMessage({
+      command: STOP_WORKER
+    });
   }
 }
 

@@ -6,7 +6,7 @@ const GameInfoCard = (props) => {
   const {className, id, title, posterUrl} = props;
   return (
     <Link to={`/game/${id}`} className={`GameInfoCard ${className}`}>
-      <img src={posterUrl}/>
+      <img src={posterUrl} alt={`A poster of the ${title} game`}/>
       <h3>{title}</h3>
     </Link>
   )

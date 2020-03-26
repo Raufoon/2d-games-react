@@ -1,5 +1,5 @@
 import React from 'react';
-import {withRouter, Link} from 'react-router-dom';
+import {withRouter} from 'react-router-dom';
 import Logger from '../../../../../services/Logger';
 import './style.css';
 
@@ -77,7 +77,6 @@ class GamePlay extends React.Component {
   }
 
   render() {
-    const url = this.props.match.url;
     const {width, height} = this.state.view;
     const {isLoading, hasStarted, isFailed, hasEnded} = this.state;
     const {instructions} = this.state;

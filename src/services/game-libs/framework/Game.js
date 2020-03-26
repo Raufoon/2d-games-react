@@ -1,6 +1,5 @@
 import Logger from '../../Logger';
 import Painter from './Painter.js';
-import GameWorker from "../../GameWorker";
 
 class Game {
   constructor(id, gameCanvas, scoreCanvas, onExit) {
@@ -28,15 +27,17 @@ class Game {
     const key = event.code;
 
     if (key in this._keyListeners) {
+      Logger.showInfo(`~~~~~~~${key} pressed~~~~~~~`, undefined, 'crimson');
       this._keyListeners[key]();
     }
   }
 
-  updateGameState(data) {
+  updateGameState(data, shouldRender=true) {
     this.previousGameState = {...this.gameState};
     this.gameState = {...this.gameState, ...data};
+
     Logger.showInfo("game state updated", {previous: this.previousGameState, current: this.gameState});
-    this.render();
+    if (shouldRender) this.render();
   }
 
   render() {throw new Error("Subclass must implement render()")}
