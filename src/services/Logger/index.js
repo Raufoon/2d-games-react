@@ -10,10 +10,12 @@ class Logger {
   }
 
   static showInfo(msg, data, color="blue") {
+    if (process.env.NODE_ENV === 'production') return;
     Logger.log(msg, data, color);
   }
 
   static showSuccess(msg, data) {
+    if (process.env.NODE_ENV === 'production') return;
     Logger.log(msg, data, 'darkgreen');
   }
 }
