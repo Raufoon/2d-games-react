@@ -6,8 +6,6 @@ import * as serviceWorker from './serviceWorker';
 import GameWorker from './services/GameWorker';
 import './index.css';
 
-GameWorker.getInstance();
-
 ReactDOM.render(
   <React.StrictMode>
     <Router>

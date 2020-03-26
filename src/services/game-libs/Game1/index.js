@@ -1,9 +1,11 @@
-import Game from './util/Game.js';
-import Logger from '../Logger';
+import Game from '../framework/Game.js';
+// eslint-disable-next-line
+import Worker from "worker-loader!./worker.js";
+import Logger from '../../Logger';
 
 class SnakeGame extends Game {
-  constructor(gameCanvas, scoreCanvas, onExit) {
-    super(gameCanvas, scoreCanvas, onExit);
+  constructor(id, gameCanvas, scoreCanvas, onExit) {
+    super(id, gameCanvas, scoreCanvas, onExit);
 
     const width = 500;
     const height = 500;
@@ -18,6 +20,15 @@ class SnakeGame extends Game {
       relativeHeight: height / dotSize,
       color: '#1e6649'
     }
+
+    this.worker = new Worker();
+    this.worker.onmessage = this.handleWorkerMsg;
+    Logger.showSuccess("game init", this);
+  }
+
+  handleWorkerMsg = (event) => {
+    const {data} = event;
+    Logger.showInfo("WORKER --> MAIN: ", data, '#ff7400');
   }
 
   _onUpPressed = () => {
@@ -68,6 +79,7 @@ class SnakeGame extends Game {
     this.registerKeyListener("ArrowRight", this._onRightPressed);
     this.registerKeyListener("ArrowDown", this._onDownPressed);
     this.registerKeyListener("ArrowLeft", this._onLeftPressed);
+    Logger.showInfo("game started successfully");
   }
 }
 

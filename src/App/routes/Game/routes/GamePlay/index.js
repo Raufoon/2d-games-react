@@ -57,21 +57,23 @@ class GamePlay extends React.Component {
   }
 
   async _fetchGame(id) {
-    const gameModule = await import(`../../../../../services/game-libs/${id}.js`);
-
+    const gameModule = await import(`../../../../../services/game-libs/Game${id}`);
     const onExit = () => this.setState({...GamePlay.initialState, hasEnded: true});
-
     const Game = gameModule.default;
-    return new Game(this.gameCanvas, this.scoreCanvas, onExit);
+    return new Game(id, this.gameCanvas, this.scoreCanvas, onExit);
   }
 
-  exitGame = () => {
+  endGame = () => {
     this.setState({...GamePlay.initialState, hasEnded: true});
-    this.game.exit();
+    this.game.end();
   }
 
   componentDidMount() {
     this._initGame();
+  }
+
+  componentWillUnmount() {
+    this.game.exit();
   }
 
   render() {
@@ -104,7 +106,7 @@ class GamePlay extends React.Component {
           </li>
           <li>
             <div className="options">
-              {hasStarted && <button onClick={this.exitGame}>End</button>}
+              {hasStarted && <button onClick={this.endGame}>End</button>}
               {hasEnded && <button onClick={this.props.history.goBack}>Back to menu</button>}
               {hasEnded && <button onClick={this.startGame}>Play again</button>}
             </div>

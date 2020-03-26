@@ -9,8 +9,8 @@ class Logger {
     }
   }
 
-  static showInfo(msg, data) {
-    Logger.log(msg, data, 'blue');
+  static showInfo(msg, data, color) {
+    Logger.log(msg, data, color || 'blue');
   }
 
   static showSuccess(msg, data) {
