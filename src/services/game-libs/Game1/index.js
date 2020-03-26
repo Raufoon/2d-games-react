@@ -1,28 +1,36 @@
 import Game from '../framework/Game.js';
-import {FACE, COMMANDS} from './constants.js';
+import {FACE, COMMANDS, FRUIT} from './constants.js';
 // eslint-disable-next-line
 import Worker from "worker-loader!./worker.js";
 import Logger from '../../Logger';
 
 const {UP, DOWN, LEFT, RIGHT} = FACE;
 const {SYNC_GAME_STATE, CHANGE_FACE, START_WORKER, STOP_WORKER} = COMMANDS;
+const {SYNC_RESULT_STATE} = COMMANDS;
+const {APPLE} = FRUIT;
 
 class SnakeGame extends Game {
-  constructor(id, gameCanvas, scoreCanvas, onExit) {
-    super(id, gameCanvas, scoreCanvas, onExit);
-
-    const width = 500;
-    const height = 500;
-    const dotSize = 10;
+  constructor(id, gameCanvas, resultCanvas, onExit) {
+    super(id, gameCanvas, resultCanvas, onExit);
 
     this.gameCanvasProps = {
       ...super.gameCanvasProps,
-      dotSize,
-      width,
-      height,
-      relativeWidth: width / dotSize,
-      relativeHeight: height / dotSize,
+      dotSize: 10,
+      width: 500,
+      height: 500,
+      relativeWidth: 50,
+      relativeHeight: 50,
       color: '#1e6649'
+    }
+
+    this.resultCanvasProps = {
+      ...super.resultCanvasProps,
+      dotSize: 10,
+      width: 400,
+      height: 200,
+      relativeWidth: 40,
+      relativeHeight: 20,
+      color: '#0e1103'
     }
 
     this.worker = new Worker();
@@ -39,6 +47,10 @@ class SnakeGame extends Game {
     switch (command) {
       case SYNC_GAME_STATE:
         this.updateGameState(rest);
+        break;
+
+      case SYNC_RESULT_STATE:
+        this.updateResultState(rest);
         break;
 
       default:
@@ -87,7 +99,12 @@ class SnakeGame extends Game {
     this.worker.postMessage({command: CHANGE_FACE, face: RIGHT});
   }
 
-  render() {
+  renderGame() {
+    {
+      const {fruit} = this.gameState;
+      const {x, y, color} = fruit;
+      this.gameCanvasPainter.drawDot(x, y, color);
+    }
     {
       const {x, y} = this.previousGameState;
       const {color} = this.gameCanvasProps;
@@ -99,14 +116,26 @@ class SnakeGame extends Game {
     }
   }
 
+  renderResult() {
+    const {score} = this.resultState;
+    const {color} = this.resultCanvasProps;
+    this.resultCanvasPainter.fillCanvas(color);
+    this.resultCanvasPainter.drawText(`SCORE: ${score}`, 1, 1, {size: 30});
+  }
+
   start() {
     super.start();
 
     this.updateGameState({
-      x: 1,
-      y: 1,
-      face: RIGHT
+      x: 1, y: 1,
+      face: RIGHT,
+      fruit: {
+        x: 10, y: 10,
+        ...APPLE
+      }
     });
+
+    this.updateResultState({score: 0})
 
     this.registerKeyListener("ArrowUp", this._onUpPressed);
     this.registerKeyListener("ArrowRight", this._onRightPressed);
@@ -116,6 +145,7 @@ class SnakeGame extends Game {
     this.worker.postMessage({
       command: START_WORKER,
       gameState: this.gameState,
+      resultState: this.resultState,
       gameCanvasProps: this.gameCanvasProps
     });
 
@@ -123,9 +153,7 @@ class SnakeGame extends Game {
   }
 
   end() {
-    this.worker.postMessage({
-      command: STOP_WORKER
-    });
+    this.worker.postMessage({command: STOP_WORKER});
   }
 }
 

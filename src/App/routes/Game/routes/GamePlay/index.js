@@ -60,7 +60,7 @@ class GamePlay extends React.Component {
     const gameModule = await import(`../../../../../services/game-libs/Game${id}`);
     const onExit = () => this.setState({...GamePlay.initialState, hasEnded: true});
     const Game = gameModule.default;
-    return new Game(id, this.gameCanvas, this.scoreCanvas, onExit);
+    return new Game(id, this.gameCanvas, this.resultCanvas, onExit);
   }
 
   endGame = () => {
@@ -101,7 +101,7 @@ class GamePlay extends React.Component {
             {hasEnded && <div className="message">Game Over!</div>}
           </li>
           <li>
-            <canvas className="scoreCanvas" ref={el => this.scoreCanvas = el} width={300} height={200}></canvas>
+            <canvas className="resultCanvas" ref={el => this.resultCanvas = el} width={300} height={200}></canvas>
           </li>
           <li>
             <div className="options">

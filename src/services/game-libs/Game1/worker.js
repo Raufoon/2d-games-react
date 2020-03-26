@@ -4,10 +4,22 @@ import {FACE, COMMANDS} from './constants.js';
 
 const {UP, DOWN, LEFT, RIGHT} = FACE;
 const {SYNC_GAME_STATE, CHANGE_FACE, START_WORKER, STOP_WORKER} = COMMANDS;
+const {SYNC_RESULT_STATE} = COMMANDS;
 
 let gameState;
 let gameCanvasProps;
 let snakeMoverInterval;
+
+let resultState;
+
+function random(max) {
+  return parseInt(Math.random() * max, 10) + 1 ;
+}
+
+function updateResultState(data, shouldSync=true) {
+  resultState = {...resultState, ...data};
+  if (shouldSync) postMessage({command: SYNC_RESULT_STATE, ...data});
+}
 
 function updateGameState(data, shouldSync=true) {
   gameState = {...gameState, ...data};
@@ -17,26 +29,47 @@ function updateGameState(data, shouldSync=true) {
 function moveSnake() {
   const {x, y} = gameState;
   const {relativeWidth, relativeHeight} = gameCanvasProps;
+  let state;
 
   switch (gameState.face) {
     case UP:
-      if (y > 0) updateGameState({y: y - 1});
+      if (y > 0) state = {y: y - 1};
       break;
 
     case DOWN:
-      if (y + 1 < relativeHeight) updateGameState({y: y + 1});
+      if (y + 1 < relativeHeight) state = {y: y + 1};
       break;
 
     case RIGHT:
-      if (x + 1 < relativeWidth) updateGameState({x: x + 1});
+      if (x + 1 < relativeWidth) state = {x: x + 1};
       break;
 
     case LEFT:
-      if (x > 0) updateGameState({x: x - 1});
+      if (x > 0) state = {x: x - 1};
       break;
 
     default:
   }
+
+  const {fruit} = gameState;
+  if (fruit.x === x && fruit.y === y) {
+    Logger.showInfo(`Snake Worker: ATE FRUIT!!!!`, undefined, 'red');
+    updateGameState({
+      ...state,
+      fruit: {
+        ...fruit,
+        x: random(relativeWidth),
+        y: random(relativeHeight),
+      }
+    });
+
+    const {score} = resultState;
+    updateResultState({score: score + 1});
+
+  } else {
+    updateGameState(state);
+  }
+
 }
 
 function startSnakeMover() {
@@ -57,6 +90,7 @@ function onMessage(event) {
     case START_WORKER:
       gameState = rest.gameState;
       gameCanvasProps = rest.gameCanvasProps;
+      resultState = rest.resultState;
       startSnakeMover();
       break;
 
