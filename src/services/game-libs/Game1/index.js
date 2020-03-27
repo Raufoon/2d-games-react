@@ -1,13 +1,12 @@
-import Game from '../framework/Game.js';
-import {FACE, COMMANDS, FRUIT} from './constants.js';
 // eslint-disable-next-line
 import Worker from "worker-loader!./worker.js";
+import Game from '../framework/Game.js';
+import {FACE, COMMANDS} from './constants.js';
 import Logger from '../../Logger';
 
 const {UP, DOWN, LEFT, RIGHT} = FACE;
 const {SYNC_GAME_STATE, CHANGE_FACE, START_WORKER, STOP_WORKER} = COMMANDS;
-const {SYNC_RESULT_STATE, GET_KILLED} = COMMANDS;
-const {APPLE} = FRUIT;
+const {SYNC_RESULT_STATE, GET_KILLED, PAINT_GAME_DOTS} = COMMANDS;
 
 class SnakeGame extends Game {
   constructor(id, gameCanvas, resultCanvas, onEnd) {
@@ -57,6 +56,14 @@ class SnakeGame extends Game {
         this.end();
         break;
 
+      case PAINT_GAME_DOTS:
+        const {dots} = rest;
+        for (let i = 0; i < dots.length; i++) {
+          const {x, y, color} = dots[i];
+          this.gameCanvasPainter.drawDot(x, y, color);
+        }
+        break;
+
       default:
     }
   }
@@ -103,23 +110,6 @@ class SnakeGame extends Game {
     this.worker.postMessage({command: CHANGE_FACE, face: RIGHT});
   }
 
-  renderGame() {
-    {
-      const {fruit} = this.gameState;
-      const {x, y, color} = fruit;
-      this.gameCanvasPainter.drawDot(x, y, color);
-    }
-    {
-      const {x, y} = this.previousGameState;
-      const {color} = this.gameCanvasProps;
-      this.gameCanvasPainter.drawDot(x, y, color);
-    }
-    {
-      const {x, y} = this.gameState;
-      this.gameCanvasPainter.drawDot(x, y, 'yellow');
-    }
-  }
-
   renderResult() {
     const {score} = this.resultState;
     const {color} = this.resultCanvasProps;
@@ -129,15 +119,6 @@ class SnakeGame extends Game {
 
   start() {
     super.start();
-
-    this.updateGameState({
-      x: 1, y: 1,
-      face: RIGHT,
-      fruit: {
-        x: 10, y: 10,
-        ...APPLE
-      }
-    });
 
     this.updateResultState({score: 0})
 
@@ -152,7 +133,6 @@ class SnakeGame extends Game {
       resultState: this.resultState,
       gameCanvasProps: this.gameCanvasProps
     });
-
     Logger.showInfo("game started successfully");
   }
 

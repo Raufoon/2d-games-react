@@ -1,10 +1,12 @@
 /* eslint-disable */
 import Logger from '../../Logger';
-import {FACE, COMMANDS} from './constants.js';
+import Snake from './Snake.js';
+import {FACE, COMMANDS, FRUIT} from './constants.js';
 
+const {APPLE} = FRUIT;
 const {UP, DOWN, LEFT, RIGHT} = FACE;
 const {SYNC_GAME_STATE, CHANGE_FACE, START_WORKER, STOP_WORKER} = COMMANDS;
-const {SYNC_RESULT_STATE, GET_KILLED} = COMMANDS;
+const {SYNC_RESULT_STATE, GET_KILLED, PAINT_GAME_DOTS} = COMMANDS;
 
 let gameState;
 let gameCanvasProps;
@@ -20,56 +22,31 @@ function updateResultState(data, shouldSync=true) {
   if (shouldSync) postMessage({command: SYNC_RESULT_STATE, ...data});
 }
 
-function updateGameState(data, shouldSync=true) {
+function updateGameState(data) {
   gameState = {...gameState, ...data};
-  if (shouldSync) postMessage({command: SYNC_GAME_STATE, ...data});
+  Logger.showInfo('WORKER: Game State updated', gameState, 'brown');
 }
 
 function tryEatingFruit() {
-  const {x, y, fruit} = gameState;
+  const {x, y} = gameState.snake.head;
+  const {fruit} = gameState;
   const {relativeWidth, relativeHeight} = gameCanvasProps;
 
   if (fruit.x === x && fruit.y === y) {
     Logger.showInfo(`Snake Worker: ATE FRUIT!!!!`, undefined, 'red');
 
-    updateGameState({
-      fruit: {
-        ...fruit,
-        x: random(relativeWidth),
-        y: random(relativeHeight),
-      }
-    });
+    const newFruit = {
+      ...fruit,
+      x: random(relativeWidth),
+      y: random(relativeHeight),
+    }
+
+    updateGameState({fruit: newFruit});
+    postMessage({command: PAINT_GAME_DOTS, dots: [newFruit]})
 
     const {score} = resultState;
     updateResultState({score: score + 1});
   }
-}
-
-function getNextPosition() {
-  const {x, y, face} = gameState;
-  let position;
-
-  switch (face) {
-    case UP:
-      position = {y: y - 1};
-      break;
-
-    case DOWN:
-      position = {y: y + 1};
-      break;
-
-    case RIGHT:
-      position = {x: x + 1};
-      break;
-
-    case LEFT:
-      position = {x: x - 1};
-      break;
-
-    default:
-      position = {x, y};
-  }
-  return position;
 }
 
 function getKilled() {
@@ -78,10 +55,15 @@ function getKilled() {
 }
 
 function moveSnake() {
-  const {relativeWidth, relativeHeight} = gameCanvasProps;
-  const nextPosition = getNextPosition();
-  const {x, y} = nextPosition;
+  const {snake} = gameState;
+  const {color} = gameCanvasProps;
 
+  const erasedDot = {...snake.tail, color};
+
+  snake.moveForward();
+  const {relativeWidth, relativeHeight} = gameCanvasProps;
+
+  const {x, y} = snake.head;
   if (x) {
     if (x < 0 || x == relativeWidth) {
       getKilled();
@@ -96,7 +78,10 @@ function moveSnake() {
     }
   }
 
-  updateGameState(nextPosition);
+  Logger.showSuccess("Snake: ", [{...snake.head}, ...snake.corners.map(corner => ({...corner})), {...snake.tail}]);
+
+  const newDot = {...snake.head, color: snake.color};
+  postMessage({command: PAINT_GAME_DOTS, dots: [newDot, erasedDot]})
 }
 
 function startSnakeMover() {
@@ -118,9 +103,14 @@ function onMessage(event) {
 
   switch (command) {
     case START_WORKER:
-      gameState = rest.gameState;
+      let snake = new Snake(10, 10);
+      let fruit = {x: 30, y: 20, ...APPLE};
+
+      gameState = {...rest.gameState, snake, fruit};
       gameCanvasProps = rest.gameCanvasProps;
       resultState = rest.resultState;
+
+      postMessage({command: PAINT_GAME_DOTS, dots: [fruit, ...snake.getAllDots()]});
       startSnakeMover();
       break;
 
@@ -129,10 +119,11 @@ function onMessage(event) {
       break;
 
     case CHANGE_FACE:
-      stopSnakeMover();
-      updateGameState(rest);
-      moveSnake();
-      startSnakeMover();
+      const {face} = rest;
+      //stopSnakeMover();
+      gameState.snake.changeFace(face);
+      //moveSnake();
+      //startSnakeMover();
       break;
 
     default:
