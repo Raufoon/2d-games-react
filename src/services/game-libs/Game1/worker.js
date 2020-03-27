@@ -34,13 +34,13 @@ function tryEatingFruit() {
   const {relativeWidth, relativeHeight} = gameCanvasProps;
 
   if (fruit.x === x && fruit.y === y) {
-    Logger.showInfo(`Snake Worker: ATE FRUIT!!!!`, undefined, 'red');
+    Logger.showInfo(`Snake Worker: ATE FRUIT!!!!`, undefined, 'orange');
 
-    //snake.grow();
+    snake.grow();
 
     const newFruit = {
       ...fruit,
-      x: random(relativeWidth),
+      x: random(relativeWidth), // TODO:  will overlap with snake!!! fix
       y: random(relativeHeight),
     }
 
@@ -67,6 +67,12 @@ function moveSnake() {
   const erasedDot = {...snake.tail, color};
 
   snake.moveForward();
+  if (snake.hasEatenMyself()) {
+    Logger.showInfo(`Snake Worker: ATE MYSELF!`, undefined, 'red');
+    getKilled();
+    return;
+  }
+
   const {relativeWidth, relativeHeight} = gameCanvasProps;
 
   const {x, y} = snake.head;
@@ -127,11 +133,8 @@ function onMessage(event) {
 
     case CHANGE_FACE:
       const {face} = rest;
-      //stopSnakeMover();
       gameState.snake.changeFace(face);
       Logger.showSuccess("Snake: ", [{...gameState.snake.tail}, ...gameState.snake.corners.map(corner => ({...corner})), {...gameState.snake.head}]);
-      //moveSnake();
-      //startSnakeMover();
       break;
 
     default:

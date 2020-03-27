@@ -43,6 +43,41 @@ class Snake {
     this.head = this._nextPosition(this.head);
   }
 
+  isOnMyBody(point) {
+    const X = point.x;
+    const Y = point.y;
+
+    let current = this.tail;
+
+    for (let i = 0; i < this.corners.length; i++) {
+      const {x, y} = this.corners[i];
+      if (current.x === X && current.y === Y) break;
+
+      if (current.x === x && x === X) {
+        const y0 = Math.min(current.y, y);
+        const y1 = Math.max(current.y, y);
+        if (X === x && y0 < Y && Y < y1) {
+          return true;
+        }
+
+      } else if (current.y === y && y === Y) {
+        const x0 = Math.min(current.x, x);
+        const x1 = Math.max(current.x, x);
+        if (x0 < X && X < x1) {
+          return true;
+        }
+      }
+
+      current = this.corners[i];
+    }
+
+    return false;
+  }
+
+  hasEatenMyself() {
+    return this.isOnMyBody(this.head);
+  }
+
   moveForward() {
     this.head = this._nextPosition(this.head);
 
