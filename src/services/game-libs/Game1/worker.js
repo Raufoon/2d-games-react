@@ -14,18 +14,22 @@ let gameCanvasProps;
 let snakeMoverInterval;
 let resultState;
 
-function createRandomFruit() {
+function createRandomFruit(position) {
+  if (position) {
+    return {...position, ...APPLE};
+  }
+
   const {relativeWidth, relativeHeight} = gameCanvasProps;
+  const {snake} = gameState;
+  const {head} = snake;
 
-  let fruit;
+  let fruit, x, y;
   do {
-    fruit = {
-      ...APPLE,
-      x: random(relativeWidth), // TODO:  will overlap with snake!!! fix
-      y: random(relativeHeight),
-    }
+    x = random(relativeWidth);
+    y = random(relativeHeight);
+    fruit = {...APPLE, x, y};
 
-  } while (gameState.snake.isOnMyBody(fruit));
+  } while ((x==head.x && y==head.y) || snake.isOnMyBody(fruit));
 
   return fruit;
 }
@@ -78,6 +82,7 @@ function moveSnake() {
   const erasedDot = {...snake.tail, color};
 
   snake.moveForward();
+
   if (snake.hasEatenMyself()) {
     Logger.showInfo(`Snake Worker: ATE MYSELF!`, undefined, 'red');
     getKilled();
@@ -128,7 +133,7 @@ function onMessage(event) {
   switch (command) {
     case START_WORKER:
       let snake = new Snake(10, 10);
-      let fruit = {x: 30, y: 30, ...APPLE};
+      let fruit = createRandomFruit({x: 30, y: 30});
 
       gameState = {...rest.gameState, snake, fruit};
       gameCanvasProps = rest.gameCanvasProps;

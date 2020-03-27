@@ -21,6 +21,7 @@ export const COMMANDS = {
 
 export const FRUIT = {
   APPLE: {
-    color: '#fd7f7e'
+    color: '#fd7f7e',
+    isRound: true,
   }
 }

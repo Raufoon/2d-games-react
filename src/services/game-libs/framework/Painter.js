@@ -16,11 +16,32 @@ class Painter {
     });
   }
 
-  drawDot(x, y, color) {
+  _drawSimpleDot(x, y, color) {
+    const ctx = this.canvas.getContext('2d');
+    ctx.fillStyle = color;
+    ctx.fillRect(x * this.dotSize, y * this.dotSize, this.dotSize, this.dotSize);
+  }
+
+  _drawRoundDot(x, y, color) {
+    const ctx = this.canvas.getContext('2d');
+    const centerX = x * this.dotSize + (this.dotSize / 2);
+    const centerY = y * this.dotSize + (this.dotSize / 2);
+    const radius = this.dotSize / 2;
+
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+    ctx.fillStyle = color;
+    ctx.fill();
+  }
+
+  drawDot(dot) {
     requestAnimationFrame(() => {
-      const ctx = this.canvas.getContext('2d');
-      ctx.fillStyle = color;
-      ctx.fillRect(x * this.dotSize, y * this.dotSize, this.dotSize, this.dotSize);
+      const {x, y, color, isRound} = dot;
+      if (isRound) {
+        this._drawRoundDot(x, y, color)
+      } else {
+        this._drawSimpleDot(x, y, color);
+      }
     });
   }
 

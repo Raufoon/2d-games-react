@@ -60,8 +60,7 @@ class SnakeGame extends Game {
       case PAINT_GAME_DOTS:
         const {dots} = rest;
         for (let i = 0; i < dots.length; i++) {
-          const {x, y, color} = dots[i];
-          this.gameCanvasPainter.drawDot(x, y, color);
+          this.gameCanvasPainter.drawDot(dots[i]);
         }
         break;
 
