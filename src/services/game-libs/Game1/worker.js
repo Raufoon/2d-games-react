@@ -14,6 +14,22 @@ let gameCanvasProps;
 let snakeMoverInterval;
 let resultState;
 
+function createRandomFruit() {
+  const {relativeWidth, relativeHeight} = gameCanvasProps;
+
+  let fruit;
+  do {
+    fruit = {
+      ...APPLE,
+      x: random(relativeWidth), // TODO:  will overlap with snake!!! fix
+      y: random(relativeHeight),
+    }
+
+  } while (gameState.snake.isOnMyBody(fruit));
+
+  return fruit;
+}
+
 function random(max) {
   return parseInt(Math.random() * max, 10) + 1 ;
 }
@@ -31,20 +47,15 @@ function updateGameState(data) {
 function tryEatingFruit() {
   const {fruit, snake} = gameState;
   const {x, y} = snake.head;
-  const {relativeWidth, relativeHeight} = gameCanvasProps;
 
   if (fruit.x === x && fruit.y === y) {
     Logger.showInfo(`Snake Worker: ATE FRUIT!!!!`, undefined, 'orange');
 
     snake.grow();
 
-    const newFruit = {
-      ...fruit,
-      x: random(relativeWidth), // TODO:  will overlap with snake!!! fix
-      y: random(relativeHeight),
-    }
-
+    const newFruit = createRandomFruit();
     updateGameState({fruit: newFruit});
+
     postMessage({
       command: PAINT_GAME_DOTS,
       dots: [newFruit, {...snake.head, color: snake.color}]
@@ -117,7 +128,7 @@ function onMessage(event) {
   switch (command) {
     case START_WORKER:
       let snake = new Snake(10, 10);
-      let fruit = {x: 30, y: 20, ...APPLE};
+      let fruit = {x: 30, y: 30, ...APPLE};
 
       gameState = {...rest.gameState, snake, fruit};
       gameCanvasProps = rest.gameCanvasProps;
