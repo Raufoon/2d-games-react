@@ -1,9 +1,10 @@
 /* eslint-disable */
 import Logger from '../../Logger';
 import Snake from './Snake.js';
-import {FACE, COMMANDS, FRUIT} from './constants.js';
+import {FACE, COMMANDS, FRUIT, SETTINGS} from './constants.js';
 
 const {APPLE} = FRUIT;
+const {MOVE_INTERVAL} = SETTINGS;
 const {UP, DOWN, LEFT, RIGHT} = FACE;
 const {SYNC_GAME_STATE, CHANGE_FACE, START_WORKER, STOP_WORKER} = COMMANDS;
 const {SYNC_RESULT_STATE, GET_KILLED, PAINT_GAME_DOTS} = COMMANDS;
@@ -28,12 +29,14 @@ function updateGameState(data) {
 }
 
 function tryEatingFruit() {
-  const {x, y} = gameState.snake.head;
-  const {fruit} = gameState;
+  const {fruit, snake} = gameState;
+  const {x, y} = snake.head;
   const {relativeWidth, relativeHeight} = gameCanvasProps;
 
   if (fruit.x === x && fruit.y === y) {
     Logger.showInfo(`Snake Worker: ATE FRUIT!!!!`, undefined, 'red');
+
+    //snake.grow();
 
     const newFruit = {
       ...fruit,
@@ -42,7 +45,10 @@ function tryEatingFruit() {
     }
 
     updateGameState({fruit: newFruit});
-    postMessage({command: PAINT_GAME_DOTS, dots: [newFruit]})
+    postMessage({
+      command: PAINT_GAME_DOTS,
+      dots: [newFruit, {...snake.head, color: snake.color}]
+    })
 
     const {score} = resultState;
     updateResultState({score: score + 1});
@@ -78,7 +84,7 @@ function moveSnake() {
     }
   }
 
-  Logger.showSuccess("Snake: ", [{...snake.head}, ...snake.corners.map(corner => ({...corner})), {...snake.tail}]);
+  Logger.showSuccess("Snake: ", [{...snake.tail}, ...snake.corners.map(corner => ({...corner})), {...snake.head}]);
 
   const newDot = {...snake.head, color: snake.color};
   postMessage({command: PAINT_GAME_DOTS, dots: [newDot, erasedDot]})
@@ -88,7 +94,8 @@ function startSnakeMover() {
   snakeMoverInterval = setInterval(() => {
     moveSnake();
     tryEatingFruit();
-  }, 800);
+
+  }, MOVE_INTERVAL);
 }
 
 function stopSnakeMover() {
@@ -122,6 +129,7 @@ function onMessage(event) {
       const {face} = rest;
       //stopSnakeMover();
       gameState.snake.changeFace(face);
+      Logger.showSuccess("Snake: ", [{...gameState.snake.tail}, ...gameState.snake.corners.map(corner => ({...corner})), {...gameState.snake.head}]);
       //moveSnake();
       //startSnakeMover();
       break;

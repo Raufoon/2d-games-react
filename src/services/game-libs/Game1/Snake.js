@@ -39,21 +39,42 @@ class Snake {
     return dots;
   }
 
+  grow() {
+    this.head = this._nextPosition(this.head);
+  }
+
   moveForward() {
     this.head = this._nextPosition(this.head);
-    this.tail = this._nextPosition(this.tail);
 
-    if (this.corners.length > 0){
+    while(this.corners.length > 0) {
       const {x, y} = this.corners[0];
 
       if (x === this.tail.x && y === this.tail.y) {
         this.tail = this.corners.shift();
-      }
+
+      } else break;
     }
+
+    this.tail = this._nextPosition(this.tail);
+  }
+
+  _isValidFace(face) {
+    if ((face === UP || face === DOWN) && (this.head.face === UP || this.head.face === DOWN)) {
+      return false;
+    }
+    if ((face === LEFT || face === RIGHT) && (this.head.face === LEFT || this.head.face === RIGHT)) {
+      return false;
+    }
+    if (this.corners.length > 0) {
+      const {x, y} = this.corners[this.corners.length - 1];
+      if (x === this.head.x && y === this.head.y) return false;
+    }
+    return true;
   }
 
   changeFace(face) {
-    this.corners = [...this.corners, {...this.head, face}];
+    if (!this._isValidFace(face)) return;
+    this.corners.push({...this.head, face});
     this.head = {...this.head, face};
   }
 

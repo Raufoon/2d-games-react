@@ -53,6 +53,7 @@ class SnakeGame extends Game {
         break;
 
       case GET_KILLED:
+        this.resultCanvasPainter.drawText("YOU DIED!!", 1, 10, {size: 40, color: 'red'});
         this.end();
         break;
 
@@ -138,7 +139,6 @@ class SnakeGame extends Game {
 
   end() {
     super.end();
-    this.resultCanvasPainter.drawText("YOU DIED!!", 1, 10, {size: 40, color: 'red'});
     this.worker.postMessage({command: STOP_WORKER});
   }
 }

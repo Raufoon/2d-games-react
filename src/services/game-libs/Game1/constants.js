@@ -5,6 +5,10 @@ export const FACE = {
   RIGHT: 'r'
 }
 
+export const SETTINGS = {
+  MOVE_INTERVAL: 200
+}
+
 export const COMMANDS = {
   SYNC_GAME_STATE: 'SYNC_GAME_STATE',
   CHANGE_FACE: 'CHANGE_FACE',
