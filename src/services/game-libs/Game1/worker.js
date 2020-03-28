@@ -7,7 +7,7 @@ const {APPLE} = FRUIT;
 const {MOVE_INTERVAL} = SETTINGS;
 const {UP, DOWN, LEFT, RIGHT} = FACE;
 const {SYNC_GAME_STATE, CHANGE_FACE, START_WORKER, STOP_WORKER} = COMMANDS;
-const {SYNC_RESULT_STATE, GET_KILLED, PAINT_GAME_DOTS} = COMMANDS;
+const {SYNC_RESULT_STATE, GET_KILLED, PAINT_GAME_DOTS, PLAY_BITE_SOUND} = COMMANDS;
 
 let gameState;
 let gameCanvasProps;
@@ -54,12 +54,12 @@ function tryEatingFruit() {
 
   if (fruit.x === x && fruit.y === y) {
     Logger.showInfo(`Snake Worker: ATE FRUIT!!!!`, undefined, 'orange');
-
     snake.grow();
 
     const newFruit = createRandomFruit();
     updateGameState({fruit: newFruit});
 
+    postMessage({command: PLAY_BITE_SOUND});
     postMessage({
       command: PAINT_GAME_DOTS,
       dots: [newFruit, {...snake.head, color: snake.color}]

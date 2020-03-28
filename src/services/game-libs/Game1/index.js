@@ -3,14 +3,19 @@ import Worker from "worker-loader!./worker.js";
 import Game from '../framework/Game.js';
 import {FACE, COMMANDS} from './constants.js';
 import Logger from '../../Logger';
+import biteSound from './bite.mp3';
 
 const {UP, DOWN, LEFT, RIGHT} = FACE;
 const {SYNC_GAME_STATE, CHANGE_FACE, START_WORKER, STOP_WORKER} = COMMANDS;
-const {SYNC_RESULT_STATE, GET_KILLED, PAINT_GAME_DOTS} = COMMANDS;
+const {SYNC_RESULT_STATE, GET_KILLED, PAINT_GAME_DOTS, PLAY_BITE_SOUND} = COMMANDS;
 
 class SnakeGame extends Game {
   constructor(id, gameCanvas, resultCanvas, onEnd) {
     super(id, gameCanvas, resultCanvas, onEnd);
+
+    this.sound = {
+      bite: new Audio(biteSound)
+    };
 
     this.gameCanvasProps = {
       ...super.gameCanvasProps,
@@ -62,6 +67,10 @@ class SnakeGame extends Game {
         for (let i = 0; i < dots.length; i++) {
           this.gameCanvasPainter.drawDot(dots[i]);
         }
+        break;
+
+      case PLAY_BITE_SOUND:
+        this.sound.bite.play();
         break;
 
       default:
