@@ -9,7 +9,7 @@ const fakeGetSetupData = () => Promise.resolve({
     width: 500,
     height: 500,
   },
-  instructions: "Some instructions will be here"
+  instructions: "Use 'UP' 'DOWN' 'LEFT' 'RIGHT' keys to move the snake"
 });
 
 class GamePlay extends React.Component {
