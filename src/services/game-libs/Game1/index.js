@@ -4,17 +4,20 @@ import Game from '../framework/Game.js';
 import {FACE, COMMANDS} from './constants.js';
 import Logger from '../../Logger';
 import biteSound from './bite.mp3';
+import crashSound from './crash.mp3';
 
 const {UP, DOWN, LEFT, RIGHT} = FACE;
 const {SYNC_GAME_STATE, CHANGE_FACE, START_WORKER, STOP_WORKER} = COMMANDS;
-const {SYNC_RESULT_STATE, GET_KILLED, PAINT_GAME_DOTS, PLAY_BITE_SOUND} = COMMANDS;
+const {SYNC_RESULT_STATE, GET_KILLED, PAINT_GAME_DOTS} = COMMANDS;
+const {PLAY_CRASH_SOUND, PLAY_BITE_SOUND} = COMMANDS;
 
 class SnakeGame extends Game {
   constructor(id, gameCanvas, resultCanvas, onEnd) {
     super(id, gameCanvas, resultCanvas, onEnd);
 
     this.sound = {
-      bite: new Audio(biteSound)
+      bite: new Audio(biteSound),
+      crash: new Audio(crashSound),
     };
 
     this.gameCanvasProps = {
@@ -71,6 +74,10 @@ class SnakeGame extends Game {
 
       case PLAY_BITE_SOUND:
         this.sound.bite.play();
+        break;
+
+      case PLAY_CRASH_SOUND:
+        this.sound.crash.play();
         break;
 
       default:

@@ -7,7 +7,8 @@ const {APPLE} = FRUIT;
 const {MOVE_INTERVAL} = SETTINGS;
 const {UP, DOWN, LEFT, RIGHT} = FACE;
 const {SYNC_GAME_STATE, CHANGE_FACE, START_WORKER, STOP_WORKER} = COMMANDS;
-const {SYNC_RESULT_STATE, GET_KILLED, PAINT_GAME_DOTS, PLAY_BITE_SOUND} = COMMANDS;
+const {SYNC_RESULT_STATE, GET_KILLED, PAINT_GAME_DOTS} = COMMANDS;
+const {PLAY_CRASH_SOUND, PLAY_BITE_SOUND} = COMMANDS;
 
 let gameState;
 let gameCanvasProps;
@@ -73,6 +74,7 @@ function tryEatingFruit() {
 function getKilled() {
   stopSnakeMover();
   postMessage({command: GET_KILLED});
+  postMessage({command: PLAY_CRASH_SOUND});
 }
 
 function moveSnake() {
